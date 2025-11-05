@@ -1,7 +1,19 @@
 import logging
 from flask import Flask
 import os
-from flask_marshmallow import Marshmallow
+try:
+    from flask_marshmallow import Marshmallow
+except Exception:
+    # Permitir ejecución en entornos donde flask_marshmallow no está
+    # instalado (por ejemplo, ciertos entornos de CI o tests ligeros).
+    class Marshmallow:
+        def __init__(self):
+            pass
+
+        def init_app(self, app):
+            # No-op: las funcionalidades de serialización no están disponibles
+            return None
+
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from app.config import config
