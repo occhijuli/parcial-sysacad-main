@@ -2,9 +2,6 @@ from abc import ABC, abstractmethod
 from io import BytesIO
 import os
 from flask import current_app, render_template, url_for
-from python_odt_template import ODTTemplate
-from python_odt_template.jinja import get_odt_renderer
-from docxtpl import DocxTemplate
 import jinja2
 
 class Document(ABC):
@@ -35,6 +32,14 @@ class PDFDocument(Document):
 
 class ODTDocument(Document):
     def generar(carpeta: str, plantilla: str, context: dict) ->BytesIO:
+        # Importar python_odt_template y su renderer en tiempo de ejecución
+        try:
+            from python_odt_template import ODTTemplate
+            from python_odt_template.jinja import get_odt_renderer
+        except Exception as e:
+            raise RuntimeError(
+                "python_odt_template no está disponible: instale la dependencia o no solicite ODT en tests.") from e
+
         odt_renderer = get_odt_renderer(media_path=url_for('static', filename='media'))
         path_template = os.path.join(current_app.root_path, f'{carpeta}', f'{plantilla}.odt')
         
@@ -57,7 +62,13 @@ class ODTDocument(Document):
     
 class DOCXDocument(Document):
     def generar(carpeta: str, plantilla: str, context: dict) ->BytesIO:
-        
+        # Importar docxtpl en tiempo de ejecución
+        try:
+            from docxtpl import DocxTemplate
+        except Exception as e:
+            raise RuntimeError(
+                "docxtpl no está disponible: instale la dependencia o no solicite DOCX en tests.") from e
+
         path_template = os.path.join(current_app.root_path, f'{carpeta}', f'{plantilla}.docx')
         doc = DocxTemplate(path_template)
         

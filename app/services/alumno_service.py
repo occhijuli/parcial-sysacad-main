@@ -17,6 +17,10 @@ class AlumnoService:
     @staticmethod
     def buscar_todos() -> list[Alumno]:
         return AlumnoRepository.buscar_todos()
+
+    @staticmethod
+    def buscar_por_especialidad(especialidad_id: int) -> list[Alumno]:
+        return AlumnoRepository.buscar_por_especialidad(especialidad_id)
     
     @staticmethod
     def actualizar(id: int, alumno: Alumno) -> Alumno:

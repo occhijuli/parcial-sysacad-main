@@ -30,3 +30,21 @@ class EspecialidadService:
     @staticmethod
     def borrar_por_id(id: int) -> bool:
         return EspecialidadRepository.borrar_por_id(id)
+
+    @staticmethod
+    def obtener_alumnos_y_facultad(id: int) -> dict:
+        """Devuelve un diccionario con la facultad y la lista de alumnos
+        de la especialidad indicada.
+        """
+        especialidad = EspecialidadRepository.buscar_por_id(id)
+        if not especialidad:
+            return None
+        # import para evitar dependencias cíclicas
+        from app.services.alumno_service import AlumnoService
+
+        alumnos = AlumnoService.buscar_por_especialidad(id)
+        facultad = especialidad.facultad
+        return {
+            'facultad': facultad,
+            'alumnos': alumnos
+        }

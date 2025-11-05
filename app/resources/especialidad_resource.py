@@ -2,9 +2,13 @@ from flask import jsonify, Blueprint, request
 
 from app.mapping.especialidad_mapping import EspecialidadMapping
 from app.services.especialidad_service import EspecialidadService
+from app.mapping.alumno_mapping import AlumnoMapping
+from app.mapping.facultad_mapping import FacultadMapping
 
 especialidad_bp = Blueprint('especialidad', __name__)
 especialidad_mapping = EspecialidadMapping()
+alumno_mapping = AlumnoMapping()
+facultad_mapping = FacultadMapping()
 
 @especialidad_bp.route('/especialidad', methods=['GET'])
 def buscar_todos():
@@ -32,3 +36,16 @@ def actualizar(id):
 def borrar_por_id(id):
     EspecialidadService.borrar_por_id(id)
     return jsonify("Especialidad borrada exitosamente"), 200
+
+
+@especialidad_bp.route('/especialidad/<hashid:id>/alumnos_facultad', methods=['GET'])
+def alumnos_y_facultad(id):
+    result = EspecialidadService.obtener_alumnos_y_facultad(id)
+    if not result:
+        return jsonify({}), 404
+    facultad = result['facultad']
+    alumnos = result['alumnos']
+    return {
+        'facultad': facultad_mapping.dump(facultad),
+        'alumnos': alumno_mapping.dump(alumnos, many=True)
+    }, 200

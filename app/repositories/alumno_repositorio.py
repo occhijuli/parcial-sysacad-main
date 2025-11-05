@@ -20,6 +20,10 @@ class AlumnoRepository:
     @staticmethod
     def buscar_todos():
         return db.session.query(Alumno).all()
+
+    @staticmethod
+    def buscar_por_especialidad(especialidad_id: int):
+        return db.session.query(Alumno).filter_by(especialidad_id=especialidad_id).all()
     
     @staticmethod
     def actualizar(alumno) -> Alumno:
