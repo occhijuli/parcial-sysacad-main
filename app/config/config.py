@@ -10,10 +10,13 @@ class Config(object):
     TESTING = False
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_RECORD_QUERIES = True
-    HASHIDS_MIN_LENGTH = os.environ.get('HASHIDS_MIN_LENGTH')
-    HASHIDS_ALPHABET = os.environ.get('HASHIDS_ALPHABET')
-    HASHIDS_SALT = os.environ.get('HASHIDS_SALT')
-    SECRET_KEY = os.environ.get('SECRET_KEY')
+    # Valores por defecto  para evitar errores cuando no existen
+    # variables de entorno durante los tests.
+    HASHIDS_MIN_LENGTH = int(os.environ.get('HASHIDS_MIN_LENGTH') or 8)
+    HASHIDS_ALPHABET = os.environ.get('HASHIDS_ALPHABET') or \
+        'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890'
+    HASHIDS_SALT = os.environ.get('HASHIDS_SALT') or ''
+    SECRET_KEY = os.environ.get('SECRET_KEY') or 'dev'
 
     @staticmethod
     def init_app(app):
@@ -23,13 +26,14 @@ class TestConfig(Config):
     TESTING = True
     DEBUG = True
     SQLALCHEMY_TRACK_MODIFICATIONS = True
-    SQLALCHEMY_DATABASE_URI = os.environ.get('TEST_DATABASE_URI')
+    # Por defecto usar sqlite en memoria para tests si no se provee la variable de entorno
+    SQLALCHEMY_DATABASE_URI = os.environ.get('TEST_DATABASE_URI') or 'sqlite:///:memory:'
     
 class DevelopmentConfig(Config):
     TESTING = True
     DEBUG = True
     SQLALCHEMY_TRACK_MODIFICATIONS = True
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DEV_DATABASE_URI')
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DEV_DATABASE_URI') or f"sqlite:///{os.path.join(basedir, 'dev.db')}"
         
 class ProductionConfig(Config):
     DEBUG = False

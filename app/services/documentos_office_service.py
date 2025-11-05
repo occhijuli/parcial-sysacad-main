@@ -3,7 +3,6 @@ from io import BytesIO
 import os
 from flask import current_app, render_template, url_for
 from python_odt_template import ODTTemplate
-from weasyprint import HTML
 from python_odt_template.jinja import get_odt_renderer
 from docxtpl import DocxTemplate
 import jinja2
@@ -22,6 +21,14 @@ class PDFDocument(Document):
                                 context=context)        
         
         base_url = url_for('static', filename='', _external=True)
+        # Importar WeasyPrint sólo cuando se genere el PDF para evitar
+        # fallos por dependencias nativas en entornos de test.
+        try:
+            from weasyprint import HTML
+        except Exception as e:
+            raise RuntimeError(
+                "WeasyPrint no está disponible: instale las dependencias nativas o evite generar PDFs en tests.") from e
+
         bytes_data = HTML(string=html_string, base_url=base_url).write_pdf()
         pdf_io = BytesIO(bytes_data)        
         return pdf_io
