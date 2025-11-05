@@ -1,33 +1,30 @@
-from app import db
 from app.models import TipoDocumento
+from app.repositories.base_repository import BaseRepository
+
 
 class TipoDocumentoRepository:
+    """Repositorio específico para TipoDocumento que delega operaciones
+    al `BaseRepository` para evitar duplicación.
+    Issue relacionada: #4
+    """
 
     @staticmethod
     def crear(tipodocumento):
-        db.session.add(tipodocumento)
-        db.session.commit()
+        return BaseRepository.crear(tipodocumento)
 
     @staticmethod
     def buscar_por_id(id: int):
-        return db.session.query(TipoDocumento).filter_by(id=id).first()
-    
+        return BaseRepository.buscar_por_id(TipoDocumento, id)
+
     @staticmethod
     def buscar_todos():
-        return db.session.query(TipoDocumento).all()
-    
+        return BaseRepository.buscar_todos(TipoDocumento)
+
     @staticmethod
     def actualizar(tipodocumento) -> TipoDocumento:
-        db.session.merge(tipodocumento)
-        db.session.commit()
-        return tipodocumento
-    
+        return BaseRepository.actualizar(tipodocumento)
+
     @staticmethod
     def borrar_por_id(id: int) -> bool:
-        tipodocumento = db.session.query(TipoDocumento).filter_by(id=id).first()
-        if not tipodocumento:
-            return False
-        db.session.delete(tipodocumento)
-        db.session.commit()
-        return True
-        
+        return BaseRepository.borrar_por_id(TipoDocumento, id)
+
